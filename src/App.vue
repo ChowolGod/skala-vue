@@ -1,6 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 
+// 실습 : 날씨 어플
+import WeatherParent from './weather/WeatherParent.vue'
+
 // ===== Basics =====
 import RefExample from './basics/RefExample.vue'
 import TextInterpolation from './basics/TextInterpolation.vue'
@@ -50,6 +53,8 @@ import SlotNamedParent from './composition/SlotNamedParent.vue'
 const current = ref('textInterpolation')
 
 const examples = {
+  weather: WeatherParent,
+
   ref: RefExample,
   textInterpolation: TextInterpolation,
   html1: VhtmlExample1,
@@ -103,6 +108,8 @@ const currentComponent = computed(() => examples[current.value])
 <template>
   <div class="container">
     <aside class="sidebar">
+      <h2>Vue 실습: 날씨 어플</h2>
+      <button @click="current = 'weather'">날씨 어플</button>
       <h2>Vue Basics</h2>
       <button @click="current = 'ref'">ref</button>
 
