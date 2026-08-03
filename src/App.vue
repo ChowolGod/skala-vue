@@ -44,8 +44,8 @@ import LifeCycleParent from './composition/LifeCycleParent.vue'
 
 import PropsEmitsParents from './composition/PropsEmitsParents.vue'
 import SlotDefaultParent from './composition/SlotDefaultParent.vue'
-import SlotScopedParent from './composition/SlotScopedParent.vue/index.js'
-import SlotNamedParent from './composition/SlotNamedParent.vue/index.js'
+import SlotScopedParent from './composition/SlotScopedParent.vue'
+import SlotNamedParent from './composition/SlotNamedParent.vue'
 
 const current = ref('textInterpolation')
 
