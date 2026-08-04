@@ -1,31 +1,13 @@
 <script setup>
 import { ref, computed, watch, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
+import SearchBar from '../components/exercise/SearchBar.vue'
+import WeatherCard from '../components/exercise/WeatherCard.vue'
+import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
+import { cities } from '../data/weather.js'
 
-import SearchBar from './SearchBar.vue'
-import WeatherCard from './WeatherCard.vue'
-import BaseDashboardCard from './BaseDashboardCard.vue'
-
+const router = useRouter()
 // 날씨 데이터
-const cities = ref([
-  {
-    id: 1,
-    name: '서울',
-    weather: '맑음',
-    temperature: 28,
-  },
-  {
-    id: 2,
-    name: '수원',
-    weather: '비',
-    temperature: 24,
-  },
-  {
-    id: 3,
-    name: '부산',
-    weather: '구름',
-    temperature: 26,
-  },
-])
 
 // 검색어
 const searchQuery = ref('')
@@ -35,7 +17,7 @@ const selectedCity = ref(null)
 
 // 검색 결과
 const filteredCities = computed(() => {
-  return cities.value.filter((city) => city.name.includes(searchQuery.value))
+  return cities.filter((city) => city.name.includes(searchQuery.value))
 })
 
 // 도시 선택
@@ -49,13 +31,7 @@ const updateSearchQuery = (newQuery) => {
 }
 
 const showDetail = (city) => {
-  const status = city.temperature >= 25 ? '🔥 더움 (25도 이상)' : '❄️ 선선함 (25도 미만)'
-
-  alert(`${city.name}
-
-현재 기온 : ${city.temperature}℃
-날씨 : ${city.weather}
-상태 : ${status}`)
+  router.push(`/weather/${city.id}`)
 }
 
 const statusMessage = ref('도시를 선택해주세요.')
