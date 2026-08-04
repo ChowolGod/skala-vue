@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import SearchBar from '../components/exercise/SearchBar.vue'
 import WeatherCard from '../components/exercise/WeatherCard.vue'
 import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
+import UnitToggler from '@/components/exercise/UnitToggler.vue'
 import { cities } from '../data/weather.js'
 
 const router = useRouter()
@@ -49,7 +50,11 @@ watchEffect(() => {
 
 <template>
   <div class="weather-page">
-    <h1>🌤 날씨 현황</h1>
+    <div class="top-menu">
+      <h1>🌤 날씨 현황</h1>
+
+      <UnitToggler />
+    </div>
 
     <!-- 검색 영역 -->
     <BaseDashboardCard title="도시 검색">
@@ -101,6 +106,16 @@ watchEffect(() => {
 <style scoped>
 .weather-page {
   width: 100%;
+}
+
+.top-menu {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.top-menu > :last-child {
+  margin-left: auto;
 }
 
 .search-box,

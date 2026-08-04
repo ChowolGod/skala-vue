@@ -1,5 +1,11 @@
 <script setup>
-defineProps({
+import { computed } from 'vue'
+import { useConfigStore } from '@/stores/configStore'
+import WeatherStatus from './WeatherStatus.vue'
+
+const configStore = useConfigStore()
+
+const props = defineProps({
   city: {
     type: Object,
     required: true,
@@ -15,6 +21,16 @@ const select = () => {
 const showDetail = () => {
   emit('show-detail')
 }
+
+const displayTemp = computed(() => {
+  const rawTemp = props.city.temperature
+
+  if (configStore.unit === 'fahrenheit') {
+    return Math.round((rawTemp * 9) / 5 + 32)
+  }
+
+  return rawTemp
+})
 </script>
 
 <template>
@@ -25,29 +41,20 @@ const showDetail = () => {
       <button @click.stop="showDetail">상세보기</button>
     </div>
 
-    <p>현재 기온: {{ city.temperature }}℃</p>
+    <p>
+      현재 기온:
+      {{ displayTemp }}{{ configStore.unitSymbol }}
+    </p>
 
     <p>날씨: {{ city.weather }}</p>
 
-    <p :class="city.temperature >= 25 ? 'hot' : 'cool'">
-      {{ city.temperature >= 25 ? '🔥 더움 (25도 이상)' : '❄️ 선선함 (25도 미만)' }}
-    </p>
+    <WeatherStatus :temperature="city.temperature" />
 
     <button @click="select">선택</button>
   </div>
 </template>
 
 <style scoped>
-.hot {
-  color: #e53935;
-  font-weight: bold;
-}
-
-.cool {
-  color: #1e88e5;
-  font-weight: bold;
-}
-
 .card-header {
   display: flex;
   justify-content: space-between;

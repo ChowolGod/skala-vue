@@ -2,10 +2,14 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
+import { useConfigStore } from '@/stores/configStore'
 import { cities } from '../data/weather'
+import WeatherStatus from '@/components/exercise/WeatherStatus.vue'
 
 const route = useRoute()
 const router = useRouter()
+
+const configStore = useConfigStore()
 
 // URL의 cityId 가져오기
 const cityId = Number(route.params.cityId)
@@ -24,6 +28,20 @@ const goHome = () => {
 const goBack = () => {
   router.back()
 }
+
+const displayTemp = computed(() => {
+  if (!city.value) {
+    return null
+  }
+
+  const temp = city.value.temperature
+
+  if (configStore.unit === 'fahrenheit') {
+    return Math.round((temp * 9) / 5 + 32)
+  }
+
+  return temp
+})
 </script>
 
 <template>
@@ -33,8 +51,8 @@ const goBack = () => {
 
     <div class="weather-detail">
       <p>
-        🌡 현재 기온:
-        {{ city.temperature }}℃
+        현재 기온:
+        {{ displayTemp }}{{ configStore.unitSymbol }}
       </p>
 
       <p>
@@ -42,10 +60,7 @@ const goBack = () => {
         {{ city.weather }}
       </p>
 
-      <p>
-        상태:
-        {{ city.temperature >= 25 ? '🔥 더움 (25도 이상)' : '❄️ 선선함 (25도 미만)' }}
-      </p>
+      <WeatherStatus :temperature="city.temperature" />
     </div>
 
     <button @click="goBack">이전 페이지</button>
