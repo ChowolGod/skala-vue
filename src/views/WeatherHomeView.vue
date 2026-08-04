@@ -5,7 +5,8 @@ import SearchBar from '../components/exercise/SearchBar.vue'
 import WeatherCard from '../components/exercise/WeatherCard.vue'
 import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
 import UnitToggler from '@/components/exercise/UnitToggler.vue'
-import { cities } from '../data/weather.js'
+import { getWeather } from '@/api/weatherApi'
+import { onMounted } from 'vue'
 
 const router = useRouter()
 // 날씨 데이터
@@ -18,7 +19,7 @@ const selectedCity = ref(null)
 
 // 검색 결과
 const filteredCities = computed(() => {
-  return cities.filter((city) => city.name.includes(searchQuery.value))
+  return weatherData.value.filter((city) => city.name.includes(searchQuery.value))
 })
 
 // 도시 선택
@@ -45,6 +46,36 @@ watch(statusMessage, (newMessage, oldMessage) => {
 
 watchEffect(() => {
   console.log(`현재 검색어: ${searchQuery.value}`)
+})
+
+const weatherData = ref([])
+
+const fetchWeather = async (cityName) => {
+  try {
+    const response = await getWeather(cityName)
+
+    console.log(response.data)
+
+    const weather = {
+      id: response.data.id,
+
+      name: response.data.name,
+
+      temperature: response.data.main.temp,
+
+      weather: response.data.weather[0].description,
+    }
+
+    weatherData.value.push(weather)
+  } catch (error) {
+    console.error('날씨 데이터를 가져오지 못했습니다.', error)
+  }
+}
+
+onMounted(() => {
+  fetchWeather('Seoul')
+  fetchWeather('Busan')
+  fetchWeather('Suwon')
 })
 </script>
 
