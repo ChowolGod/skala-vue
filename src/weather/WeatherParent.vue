@@ -1,5 +1,9 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, watchEffect } from 'vue'
+
+import SearchBar from './SearchBar.vue'
+import WeatherCard from './WeatherCard.vue'
+import BaseDashboardCard from './BaseDashboardCard.vue'
 
 // 날씨 데이터
 const cities = ref([
@@ -8,21 +12,18 @@ const cities = ref([
     name: '서울',
     weather: '맑음',
     temperature: 28,
-    status: '더움',
   },
   {
     id: 2,
     name: '수원',
     weather: '비',
     temperature: 24,
-    status: '선선함',
   },
   {
     id: 3,
     name: '부산',
     weather: '구름',
     temperature: 26,
-    status: '보통',
   },
 ])
 
@@ -40,7 +41,34 @@ const filteredCities = computed(() => {
 // 도시 선택
 const selectCity = (city) => {
   selectedCity.value = city
+  statusMessage.value = `${city.name}이(가) 선택되었습니다.`
 }
+
+const updateSearchQuery = (newQuery) => {
+  searchQuery.value = newQuery
+}
+
+const showDetail = (city) => {
+  const status = city.temperature >= 25 ? '🔥 더움 (25도 이상)' : '❄️ 선선함 (25도 미만)'
+
+  alert(`${city.name}
+
+현재 기온 : ${city.temperature}℃
+날씨 : ${city.weather}
+상태 : ${status}`)
+}
+
+const statusMessage = ref('도시를 선택해주세요.')
+
+watch(statusMessage, (newMessage, oldMessage) => {
+  console.log('===== 상태바 변경 =====')
+  console.log('이전:', oldMessage)
+  console.log('현재:', newMessage)
+})
+
+watchEffect(() => {
+  console.log(`현재 검색어: ${searchQuery.value}`)
+})
 </script>
 
 <template>
@@ -48,44 +76,26 @@ const selectCity = (city) => {
     <h1>🌤 날씨 현황</h1>
 
     <!-- 검색 영역 -->
-    <div class="search-box">
-      <h2>도시 검색</h2>
-
-      <input v-model="searchQuery" placeholder="검색할 도시 입력" />
-
-      <p>
-        검색 중:
-        {{ searchQuery }}
+    <BaseDashboardCard title="도시 검색">
+      <SearchBar :query="searchQuery" @update-query="updateSearchQuery" />
+      <p class="search-status">
+        🔍 현재 검색어 :
+        <span>{{ searchQuery || '없음' }}</span>
       </p>
-    </div>
+    </BaseDashboardCard>
 
     <!-- 날씨 목록 -->
-    <div class="weather-list">
-      <h2>지역별 날씨 현황</h2>
-
-      <div v-for="city in filteredCities" :key="city.id" class="weather-card">
-        <h3>
-          {{ city.name }}
-        </h3>
-
-        <p>
-          현재 기온:
-          {{ city.temperature }}℃
-        </p>
-
-        <p>
-          날씨:
-          {{ city.weather }}
-        </p>
-
-        <p>
-          상태:
-          {{ city.status }}
-        </p>
-
-        <button @click="selectCity(city)">선택</button>
+    <BaseDashboardCard title="지역별 날씨 현황">
+      <div class="weather-list">
+        <WeatherCard
+          v-for="city in filteredCities"
+          :key="city.id"
+          :city="city"
+          @select-city="selectCity(city)"
+          @show-detail="showDetail(city)"
+        />
       </div>
-    </div>
+    </BaseDashboardCard>
 
     <!-- 선택 결과 -->
     <div v-if="selectedCity" class="selected-box">
@@ -106,6 +116,9 @@ const selectCity = (city) => {
         {{ selectedCity.weather }}
       </p>
     </div>
+  </div>
+  <div class="status-bar">
+    {{ statusMessage }}
   </div>
 </template>
 
@@ -152,5 +165,27 @@ button {
 
 .selected-box {
   background: #f0fdf4;
+}
+
+.status-bar {
+  margin-top: 20px;
+  padding: 12px 16px;
+
+  border-radius: 8px;
+
+  background: #eef6ff;
+  border: 1px solid #c7defc;
+}
+
+.search-status {
+  margin-top: 12px;
+  padding: 8px 12px;
+
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.search-status span {
+  font-weight: bold;
 }
 </style>
