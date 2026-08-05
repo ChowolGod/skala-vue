@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 
 import { useConfigStore } from '@/stores/configStore'
 import { useWeatherStore } from '@/stores/weatherStore'
-import { getWeather } from '@/api/weatherApi'
 import WeatherStatus from '@/components/exercise/WeatherStatus.vue'
 
 import { onMounted } from 'vue'
@@ -22,14 +21,7 @@ const city = computed(() => {
 
 onMounted(async () => {
   try {
-    const response = await getWeather(route.params.cityId)
-
-    city.value = {
-      id: response.data.id,
-      name: response.data.name,
-      temperature: response.data.main.temp,
-      weather: response.data.weather[0].description,
-    }
+    await weatherStore.fetchWeather(route.params.cityId)
   } catch (error) {
     console.error(error)
   }
