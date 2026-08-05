@@ -12,7 +12,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['select-city', 'show-detail'])
+const emit = defineEmits(['select-city', 'show-detail', 'remove-city'])
 
 const select = () => {
   emit('select-city')
@@ -51,6 +51,7 @@ const displayTemp = computed(() => {
     <WeatherStatus :temperature="city.temperature" />
 
     <button @click="select">선택</button>
+    <button @click.stop="emit('remove-city')">삭제</button>
   </div>
 </template>
 

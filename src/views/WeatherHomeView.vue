@@ -7,7 +7,9 @@ import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
 import UnitToggler from '@/components/exercise/UnitToggler.vue'
 import { getWeather } from '@/api/weatherApi'
 import { onMounted } from 'vue'
+import { useWeatherStore } from '@/stores/weatherStore'
 
+const weatherStore = useWeatherStore()
 const router = useRouter()
 // 날씨 데이터
 
@@ -19,13 +21,18 @@ const selectedCity = ref(null)
 
 // 검색 결과
 const filteredCities = computed(() => {
-  return weatherData.value.filter((city) => city.name.includes(searchQuery.value))
+  return weatherStore.cities.filter((city) =>
+    city.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  )
 })
-
 // 도시 선택
 const selectCity = (city) => {
   selectedCity.value = city
   statusMessage.value = `${city.name}이(가) 선택되었습니다.`
+}
+
+const removeCity = (id) => {
+  weatherStore.removeCity(id)
 }
 
 const updateSearchQuery = (newQuery) => {
@@ -44,31 +51,41 @@ watch(statusMessage, (newMessage, oldMessage) => {
   console.log('현재:', newMessage)
 })
 
+watch(searchQuery, () => {
+  errorMessage.value = ''
+})
+
 watchEffect(() => {
   console.log(`현재 검색어: ${searchQuery.value}`)
 })
 
-const weatherData = ref([])
+const loading = ref(false)
+const errorMessage = ref('')
 
 const fetchWeather = async (cityName) => {
+  loading.value = true // 로딩 시작
+
   try {
     const response = await getWeather(cityName)
 
-    console.log(response.data)
-
-    const weather = {
+    // 기존 코드
+    const city = {
       id: response.data.id,
-
       name: response.data.name,
-
       temperature: response.data.main.temp,
-
       weather: response.data.weather[0].description,
     }
 
-    weatherData.value.push(weather)
+    weatherStore.addCity(city)
+
+    errorMessage.value = ''
+
+    searchQuery.value = ''
   } catch (error) {
-    console.error('날씨 데이터를 가져오지 못했습니다.', error)
+    errorMessage.value = '존재하지 않는 도시입니다.'
+    console.error(error)
+  } finally {
+    loading.value = false // 성공/실패 상관없이 종료
   }
 }
 
@@ -89,7 +106,11 @@ onMounted(() => {
 
     <!-- 검색 영역 -->
     <BaseDashboardCard title="도시 검색">
-      <SearchBar :query="searchQuery" @update-query="updateSearchQuery" />
+      <SearchBar
+        :query="searchQuery"
+        @update-query="updateSearchQuery"
+        @search="fetchWeather(searchQuery)"
+      />
       <p class="search-status">
         🔍 현재 검색어 :
         <span>{{ searchQuery || '없음' }}</span>
@@ -98,6 +119,12 @@ onMounted(() => {
 
     <!-- 날씨 목록 -->
     <BaseDashboardCard title="지역별 날씨 현황">
+      <p v-if="loading" class="loading">🔄 날씨 정보를 불러오는 중입니다...</p>
+
+      <p v-if="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </p>
+
       <div class="weather-list">
         <WeatherCard
           v-for="city in filteredCities"
@@ -105,6 +132,7 @@ onMounted(() => {
           :city="city"
           @select-city="selectCity(city)"
           @show-detail="showDetail(city)"
+          @remove-city="removeCity(city.id)"
         />
       </div>
     </BaseDashboardCard>
@@ -209,5 +237,15 @@ button {
 
 .search-status span {
   font-weight: bold;
+}
+
+.error-message {
+  margin-top: 10px;
+  padding: 10px;
+
+  color: #dc2626;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
 }
 </style>

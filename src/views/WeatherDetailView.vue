@@ -3,20 +3,36 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import { useConfigStore } from '@/stores/configStore'
-import { cities } from '../data/weather'
+import { useWeatherStore } from '@/stores/weatherStore'
+import { getWeather } from '@/api/weatherApi'
 import WeatherStatus from '@/components/exercise/WeatherStatus.vue'
+
+import { onMounted } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
 
 const configStore = useConfigStore()
-
-// URL의 cityId 가져오기
-const cityId = Number(route.params.cityId)
+const weatherStore = useWeatherStore()
 
 // 해당 도시 찾기
 const city = computed(() => {
-  return cities.find((city) => city.id === cityId)
+  return weatherStore.cities.find((city) => city.id === Number(route.params.cityId))
+})
+
+onMounted(async () => {
+  try {
+    const response = await getWeather(route.params.cityId)
+
+    city.value = {
+      id: response.data.id,
+      name: response.data.name,
+      temperature: response.data.main.temp,
+      weather: response.data.weather[0].description,
+    }
+  } catch (error) {
+    console.error(error)
+  }
 })
 
 // 홈으로 이동
