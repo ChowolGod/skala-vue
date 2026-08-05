@@ -5,7 +5,7 @@ import SearchBar from '../components/exercise/SearchBar.vue'
 import WeatherCard from '../components/exercise/WeatherCard.vue'
 import AppCard from '@/components/ui/AppCard.vue'
 import UnitToggler from '@/components/exercise/UnitToggler.vue'
-import { getWeather } from '@/api/weatherApi'
+import { getGeoLocation, getWeatherByLocation } from '@/api/weatherApi'
 import { onMounted } from 'vue'
 import { useWeatherStore } from '@/stores/weatherStore'
 
@@ -63,38 +63,44 @@ const loading = ref(false)
 const errorMessage = ref('')
 
 const fetchWeather = async (cityName) => {
-  loading.value = true // 로딩 시작
+  loading.value = true
 
   try {
-    const response = await getWeather(cityName)
+    // 1. 도시 검색
+    const geoResponse = await getGeoLocation(cityName)
+    if (!geoResponse.data.length) {
+      throw new Error('도시 없음')
+    }
 
-    // 기존 코드
+    const { lat, lon } = geoResponse.data[0]
+
+    // 2. 날씨 조회
+    const weatherResponse = await getWeatherByLocation(lat, lon)
+
     const city = {
-      id: response.data.id,
-      name: response.data.name,
-      temperature: response.data.main.temp,
-      weather: response.data.weather[0].description,
+      id: weatherResponse.data.id,
 
-      icon: response.data.weather[0].icon,
+      name: cityName,
+
+      temperature: weatherResponse.data.main.temp,
+
+      weather: weatherResponse.data.weather[0].description,
+
+      icon: weatherResponse.data.weather[0].icon,
     }
 
     weatherStore.addCity(city)
-
-    errorMessage.value = ''
-
-    searchQuery.value = ''
-  } catch (error) {
+  } catch {
     errorMessage.value = '존재하지 않는 도시입니다.'
-    console.error(error)
   } finally {
-    loading.value = false // 성공/실패 상관없이 종료
+    loading.value = false
   }
 }
 
 onMounted(() => {
-  fetchWeather('Seoul')
-  fetchWeather('Busan')
-  fetchWeather('Suwon')
+  fetchWeather('서울')
+  fetchWeather('부산')
+  fetchWeather('수원')
 })
 </script>
 

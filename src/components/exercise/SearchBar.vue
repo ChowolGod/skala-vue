@@ -15,7 +15,7 @@ const emit = defineEmits(['update-query', 'search'])
       :value="query"
       @input="emit('update-query', $event.target.value)"
       @keyup.enter="emit('search')"
-      placeholder="도시 이름을 입력하세요 (예: Seoul, Busan, Suwon)"
+      placeholder="도시 이름을 입력하세요 (예: 서울, 부산, 수원)"
     />
     <button @click="emit('search')">검색</button>
   </div>
