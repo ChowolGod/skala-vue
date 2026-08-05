@@ -71,6 +71,8 @@ const displayTemp = computed(() => {
         {{ displayTemp }}{{ configStore.unitSymbol }}
       </p>
 
+      <img :src="`https://openweathermap.org/img/wn/${city.icon}@2x.png`" :alt="city.weather" />
+
       <p>
         🌤 날씨:
         {{ city.weather }}

@@ -74,6 +74,8 @@ const fetchWeather = async (cityName) => {
       name: response.data.name,
       temperature: response.data.main.temp,
       weather: response.data.weather[0].description,
+
+      icon: response.data.weather[0].icon,
     }
 
     weatherStore.addCity(city)

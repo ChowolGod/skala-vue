@@ -37,8 +37,14 @@ const displayTemp = computed(() => {
   <div class="weather-card" @click="select">
     <div class="card-header">
       <h3>{{ city.name }}</h3>
-
-      <button @click.stop="showDetail">상세보기</button>
+      <div class="card-header-right">
+        <img
+          class="weather-icon"
+          :src="`https://openweathermap.org/img/wn/${city.icon}@2x.png`"
+          :alt="city.weather"
+        />
+        <button @click.stop="showDetail">상세보기</button>
+      </div>
     </div>
 
     <p>
@@ -60,7 +66,7 @@ const displayTemp = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
+  gap: 8px;
   margin-bottom: 12px;
 }
 
@@ -72,10 +78,21 @@ const displayTemp = computed(() => {
   padding: 6px 12px;
 }
 
+.card-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .weather-card {
   padding: 15px;
 
   border: 1px solid #ddd;
   border-radius: 8px;
+}
+
+.weather-icon {
+  width: 50px;
+  height: 50px;
 }
 </style>
