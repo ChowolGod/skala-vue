@@ -3,7 +3,7 @@ import { ref, computed, watch, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import SearchBar from '../components/exercise/SearchBar.vue'
 import WeatherCard from '../components/exercise/WeatherCard.vue'
-import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
+import AppCard from '@/components/ui/AppCard.vue'
 import UnitToggler from '@/components/exercise/UnitToggler.vue'
 import { getWeather } from '@/api/weatherApi'
 import { onMounted } from 'vue'
@@ -107,7 +107,7 @@ onMounted(() => {
     </div>
 
     <!-- 검색 영역 -->
-    <BaseDashboardCard title="도시 검색">
+    <AppCard title="도시 검색">
       <SearchBar
         :query="searchQuery"
         @update-query="updateSearchQuery"
@@ -117,10 +117,10 @@ onMounted(() => {
         🔍 현재 검색어 :
         <span>{{ searchQuery || '없음' }}</span>
       </p>
-    </BaseDashboardCard>
+    </AppCard>
 
     <!-- 날씨 목록 -->
-    <BaseDashboardCard title="지역별 날씨 현황">
+    <AppCard title="지역별 날씨 현황">
       <p v-if="loading" class="loading">🔄 날씨 정보를 불러오는 중입니다...</p>
 
       <p v-if="errorMessage" class="error-message">
@@ -137,7 +137,7 @@ onMounted(() => {
           @remove-city="removeCity(city.id)"
         />
       </div>
-    </BaseDashboardCard>
+    </AppCard>
 
     <!-- 선택 결과 -->
     <div v-if="selectedCity" class="selected-box">
@@ -166,7 +166,11 @@ onMounted(() => {
 
 <style scoped>
 .weather-page {
-  width: 100%;
+  background: #f8fafc;
+
+  padding: 32px;
+
+  min-height: 100vh;
 }
 
 .top-menu {
@@ -249,5 +253,13 @@ button {
   background: #fee2e2;
   border: 1px solid #fca5a5;
   border-radius: 8px;
+}
+
+h1 {
+  margin: 0;
+
+  font-size: 36px;
+
+  color: #1e293b;
 }
 </style>

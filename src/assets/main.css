@@ -26,3 +26,13 @@ a,
     flex-direction: column;
   }
 }
+
+body {
+  margin: 0;
+
+  background: #f8fafc;
+
+  color: #1e293b;
+
+  font-family: Inter, Pretendard, sans-serif;
+}
